@@ -1,7 +1,7 @@
 {
-  "version": "1.4.0",
-  "date": "2026-04-10",
+  "version": "1.4.1",
+  "date": "2026-05-25",
   "changes": [
-    "優化軟體介面"
+    "Restore gemini to fash 2.5"
   ]
 }
