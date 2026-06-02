@@ -1,38 +1,37 @@
-// Gemini API calls: text generation, TTS, exam generation, and explanations.
+// OpenAI API calls: text generation, TTS, exam generation, and explanations.
+// Mirrors the interface of apiGemini.js so apiProvider.js can dispatch transparently.
 
-import { state, TEXT_MODEL, TTS_MODEL } from './state.js';
+import { state, OPENAI_TEXT_MODEL, OPENAI_TTS_MODEL } from './state.js';
 import { DB } from './db.js';
 import { getLocaleMeta } from './i18n.js';
 import { normalizeExamOutput } from './examNormalize.js';
 
-function ensureCandidateText(data) {
-    if (data?.error) throw new Error(data.error.message || 'Gemini API error');
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Gemini 回傳內容為空');
-    return text;
+function getTextModel() {
+    const m = state.selectedModel;
+    return (m && m !== '__custom__') ? m : OPENAI_TEXT_MODEL;
 }
 
-function parseJsonCandidateText(rawText) {
-    const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-}
-
-function getEffectiveGeminiModel(fallback) {
-    return (state.selectedModel && state.selectedModel !== '__custom__' ? state.selectedModel : null) || fallback;
-}
-
-async function fetchJsonFromPrompt(model, prompt) {
-    const effectiveModel = getEffectiveGeminiModel(model);
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${effectiveModel}:generateContent?key=${state.apiKey}`, {
+async function fetchJsonFromPrompt(prompt) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.openaiApiKey}`
+        },
         body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: "application/json" }
+            model: getTextModel(),
+            messages: [{ role: 'user', content: prompt }],
+            response_format: { type: 'json_object' }
         })
     });
     const data = await response.json();
-    return parseJsonCandidateText(ensureCandidateText(data));
+    if (!response.ok || data?.error) {
+        throw new Error(data?.error?.message || `OpenAI API error (${response.status})`);
+    }
+    const text = data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error('OpenAI 回傳內容為空');
+    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
 }
 
 export async function fetchGeminiText(score, customTopic) {
@@ -52,7 +51,7 @@ export async function fetchGeminiText(score, customTopic) {
         }
         For "phrases": pick 2-3 commonly used phrases from the passage. Return ONLY raw JSON.
     `;
-    return fetchJsonFromPrompt(TEXT_MODEL, prompt);
+    return fetchJsonFromPrompt(prompt);
 }
 
 function lexicalCacheKey(query) {
@@ -67,7 +66,7 @@ export async function fetchWordDetails(word) {
     const targetLang = `${locale.name} (${locale.inLocal})`;
     const q = JSON.stringify(key);
     const prompt = `Explain the English word ${q} for a TOEIC student. Keep it concise like a vocabulary card. Output JSON strictly with this shape: {"word":string (the headword, lowercase),"pos":"part of speech (e.g. n./v./adj./vi./vt.)","ipa":"IPA or empty string if unclear","def":"Brief ${targetLang} definition (one short phrase)","ex":"One simple short English example sentence.","ex_zh":"${targetLang} translation of the example sentence","verb_forms":null OR {"base":string,"past":string,"past_participle":string} — use verb_forms only when pos is a verb (v./vi./vt.); otherwise verb_forms must be null.}`;
-    const result = await fetchJsonFromPrompt(TEXT_MODEL, prompt);
+    const result = await fetchJsonFromPrompt(prompt);
     await DB.setWord(key, result);
     return result;
 }
@@ -80,59 +79,9 @@ export async function fetchPhraseDetails(phrase) {
     const targetLang = `${locale.name} (${locale.inLocal})`;
     const q = JSON.stringify(key);
     const prompt = `Explain the English phrase or collocation ${q} for a TOEIC student. Keep it concise like a vocabulary card. Output JSON strictly: {"word":string (the phrase, natural casing ok but match input meaning),"pos":"phr.","ipa":"","def":"Brief ${targetLang} meaning (one short phrase)","ex":"One simple short English example sentence using the phrase.","ex_zh":"${targetLang} translation of the example sentence"}`;
-    const result = await fetchJsonFromPrompt(TEXT_MODEL, prompt);
+    const result = await fetchJsonFromPrompt(prompt);
     await DB.setWord(key, result);
     return result;
-}
-
-export async function validateWordWithLanguageTool(word) {
-    const query = String(word || '').trim();
-    if (!query) {
-        return { ok: false, reason: 'empty', message: 'Empty word' };
-    }
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-        const body = new URLSearchParams();
-        body.set('text', query);
-        body.set('language', 'en-US');
-        const response = await fetch('https://api.languagetool.org/v2/check', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: body.toString(),
-            signal: controller.signal
-        });
-        if (!response.ok) {
-            return { ok: false, reason: 'service_unavailable', message: `LanguageTool HTTP ${response.status}` };
-        }
-        const data = await response.json();
-        const matches = Array.isArray(data?.matches) ? data.matches : [];
-        const typoMatches = matches.filter((item) => {
-            const ruleId = String(item?.rule?.id || '').toUpperCase();
-            return ruleId.includes('MORFOLOGIK')
-                || ruleId.includes('SPELL')
-                || ruleId.includes('TYP')
-                || ruleId.includes('MISSPELL');
-        });
-        if (!typoMatches.length) return { ok: true, reason: 'ok', suggestions: [] };
-        const suggestions = [];
-        typoMatches.forEach((item) => {
-            const replacements = Array.isArray(item?.replacements) ? item.replacements : [];
-            replacements.forEach((rep) => {
-                const v = String(rep?.value || '').trim();
-                if (!v) return;
-                if (!suggestions.includes(v)) suggestions.push(v);
-            });
-        });
-        return { ok: false, reason: 'spelling', suggestions: suggestions.slice(0, 5) };
-    } catch (error) {
-        const message = error?.name === 'AbortError'
-            ? 'LanguageTool timeout'
-            : (error?.message || 'LanguageTool request failed');
-        return { ok: false, reason: 'service_unavailable', message };
-    } finally {
-        clearTimeout(timeoutId);
-    }
 }
 
 export async function fetchExamQuestions(score) {
@@ -161,7 +110,7 @@ export async function fetchExamQuestions(score) {
         - Use ${targetLang} for explanations if needed, but question can be English.
         - Return raw JSON only.
     `;
-    const raw = await fetchJsonFromPrompt(TEXT_MODEL, prompt);
+    const raw = await fetchJsonFromPrompt(prompt);
     return normalizeExamOutput(raw);
 }
 
@@ -184,21 +133,34 @@ export async function fetchExamWrongAnswerExplanations(payload) {
         Wrong-answer payload:
         ${JSON.stringify(payload)}
     `;
-    const result = await fetchJsonFromPrompt(TEXT_MODEL, prompt);
+    const result = await fetchJsonFromPrompt(prompt);
     return Array.isArray(result?.items) ? result.items : [];
 }
 
 export async function fetchGeminiTTS(text, voiceName) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${state.apiKey}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } } } })
+    const voice = (voiceName === 'random' || !voiceName) ? 'alloy' : voiceName;
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.openaiApiKey}`
+        },
+        body: JSON.stringify({
+            model: OPENAI_TTS_MODEL,
+            input: text,
+            voice,
+            response_format: 'mp3'
+        })
     });
-    const data = await response.json();
-    if (!response.ok || data?.error) {
-        const message = data?.error?.message || 'TTS failed';
-        const error = new Error(message);
-        error.code = data?.error?.code || response.status;
+    if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        const error = new Error(errData?.error?.message || `OpenAI TTS error (${response.status})`);
+        error.code = response.status;
         throw error;
     }
-    return data.candidates[0].content.parts[0].inlineData.data;
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8 = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
+    return 'mp3:' + btoa(binary);
 }
