@@ -4,6 +4,12 @@
 
 > 零安裝、零月費、AI 驅動的多益學習神器。打開瀏覽器就能練，忙碌的你也能高效備考。
 
+---
+
+## 關於本 Fork
+
+本 repo 是從 [brucefay1115/toeic-learning](https://github.com/brucefay1115/toeic-learning) fork 而來，並在此基礎上進行修改與實驗。本 repo 中的修改，我都會開 Pull Request 回貢獻給原作者 [brucefay1115](https://github.com/brucefay1115)。
+
 ## Demo
 
 [![Demo Video](https://img.youtube.com/vi/zNm1YYRIGrE/0.jpg)](https://youtube.com/shorts/zNm1YYRIGrE)
@@ -14,7 +20,7 @@
 
 ## 👉 立即使用
 
-**[https://brucefay1115.github.io/toeic-learning](https://brucefay1115.github.io/toeic-learning)**
+**[https://griiid.github.io/toeic-learning](https://griiid.github.io/toeic-learning)**
 
 不用下載、不用安裝，點開連結就能開始學習！
 
@@ -105,7 +111,7 @@
 
 ## 快速開始
 
-1. 打開 **[https://brucefay1115.github.io/toeic-learning](https://brucefay1115.github.io/toeic-learning)**
+1. 打開 **[https://griiid.github.io/toeic-learning](https://griiid.github.io/toeic-learning)**
 2. 將網頁加入手機主畫面，享受全螢幕 App 體驗
 3. 設定免費的 Gemini API Key
 4. 開始學習！
@@ -196,7 +202,7 @@ AI 生成文章後自動跳到「學習」頁面：
 
 ## 支持這個專案
 
-如果覺得這個工具對你有幫助，歡迎請我喝杯咖啡，支持我持續開發更多功能！
+如果覺得這個工具對你有幫助，歡迎請原作者 [brucefay1115](https://github.com/brucefay1115) 喝杯咖啡，支持他持續開發更多功能！
 
 [![Facebook](https://img.shields.io/badge/Facebook-Bruce%20Yang-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/bruce.yang.94)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Chun--Hsiang%20Yang-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/chun-hsiang-yang-b17238165)

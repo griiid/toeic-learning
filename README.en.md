@@ -4,6 +4,12 @@ English | [中文](./README.md)
 
 > Zero install, zero monthly fee, AI-powered TOEIC learning. Open your browser and start practicing anytime, anywhere.
 
+---
+
+## About This Fork
+
+This repo is forked from [brucefay1115/toeic-learning](https://github.com/brucefay1115/toeic-learning) and contains personal modifications and experiments. Changes made in this repo will be submitted as Pull Requests back to the original author [brucefay1115](https://github.com/brucefay1115).
+
 ## Demo
 
 [![Demo Video](https://img.youtube.com/vi/zNm1YYRIGrE/0.jpg)](https://youtube.com/shorts/zNm1YYRIGrE)
@@ -14,7 +20,7 @@ English | [中文](./README.md)
 
 ## 👉 Start Now
 
-**[https://brucefay1115.github.io/toeic-learning](https://brucefay1115.github.io/toeic-learning)**
+**[https://griiid.github.io/toeic-learning](https://griiid.github.io/toeic-learning)**
 
 No download, no installation. Just open the link and start learning.
 
@@ -103,7 +109,7 @@ This project uses the free tier of [Google Gemini API](https://aistudio.google.c
 
 ## Quick Start
 
-1. Open **[https://brucefay1115.github.io/toeic-learning](https://brucefay1115.github.io/toeic-learning)**
+1. Open **[https://griiid.github.io/toeic-learning](https://griiid.github.io/toeic-learning)**
 2. Add it to your home screen for a full-screen app experience
 3. Configure your free Gemini API key
 4. Start learning
@@ -192,7 +198,7 @@ After signing in on the settings page, you can use **Back Up Now / Restore from 
 
 ## Support This Project
 
-If this tool helps your learning, feel free to buy me a coffee so I can keep building more features.
+If this tool helps your learning, feel free to buy the original author [brucefay1115](https://github.com/brucefay1115) a coffee to support continued development!
 
 [![Facebook](https://img.shields.io/badge/Facebook-Bruce%20Yang-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/bruce.yang.94)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Chun--Hsiang%20Yang-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/chun-hsiang-yang-b17238165)
