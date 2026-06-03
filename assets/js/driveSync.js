@@ -30,7 +30,7 @@ function sanitizeBackupPayload(raw) {
 }
 
 export const DriveSync = {
-    CLIENT_ID: '577652285741-f97oivf3f7h2u9b02hhq9man1f807v16.apps.googleusercontent.com',
+    CLIENT_ID: '45383186281-ge26nq8ll8s3j2eb77ap4dbnmfivgbtg.apps.googleusercontent.com',
     SCOPES: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
     BACKUP_FILENAME: 'toeic-tutor-backup.json',
     tokenClient: null,
