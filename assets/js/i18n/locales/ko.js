@@ -146,7 +146,7 @@ export default {
     "cloudRestoreBtn": "클라우드에서 복원",
     "cloudLogoutBtn": "로그아웃",
     "srsPhaseBadgeDefault": "영어 -> 한국어",
-    "aboutBio": "TOEIC AI Tutor 개발자<br>기술로 학습 문제를 해결하는 것을 좋아하며, 누구나 쉽게 영어를 배우길 바랍니다.<br>이 도구가 도움이 되었다면 응원 부탁드립니다!",
+    "aboutBio": "다년간의 실무 경험을 가진 백엔드 엔지니어. 2026년 토익 준비 중 이 사이트를 발견했지만, 당시 OpenAI를 지원하지 않아 직접 Fork하여 사용하기 시작했다.",
     "aboutFacebookDesc": "내 소식 팔로우",
     "aboutLinkedinDesc": "전문 경력 보기",
     "aboutGithubDesc": "오픈소스 코드 보기, Star 환영 ⭐",

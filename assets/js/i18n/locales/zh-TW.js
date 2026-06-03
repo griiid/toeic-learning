@@ -138,7 +138,7 @@ export default {
     "cloudRestoreBtn": "從雲端還原",
     "cloudLogoutBtn": "登出",
     "srsPhaseBadgeDefault": "英文 -> 中文",
-    "aboutBio": "TOEIC AI Tutor 開發者<br>熱愛用技術解決學習問題，希望讓每個人都能輕鬆學英文。<br>如果這個工具對你有幫助，歡迎給我一點鼓勵！",
+    "aboutBio": "多年工作經驗的後端工程師，2026 年因為要考多益找到了 TOEIC AI Tutor 這個網站，但是因為當時還不支援 OpenAI，所以 Fork 了一份自己先使用。",
     "aboutFacebookDesc": "追蹤我的動態",
     "aboutLinkedinDesc": "了解我的專業背景",
     "aboutGithubDesc": "查看開源程式碼，歡迎 Star ⭐",
