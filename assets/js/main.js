@@ -416,11 +416,7 @@ async function saveApiKey() {
     await DB.setSetting('selected_model', modelVal || null);
 
     const hasActiveKey = providerVal === 'openai' ? !!openaiVal : !!geminiVal;
-    if (!hasActiveKey) {
-        document.getElementById('btnCloseKeyModal').style.display = 'none';
-        keyModal.classList.add('active');
-        return;
-    }
+    document.getElementById('btnCloseKeyModal').style.display = hasActiveKey ? 'flex' : 'none';
     keyModal.classList.remove('active');
     renderVoiceOptions();
 }
