@@ -144,7 +144,7 @@ export default {
     "aboutGithubDesc": "查看開源程式碼，歡迎 Star ⭐",
     "aboutFeedbackTitle": "Bug 回報 / 建議",
     "aboutCoffeeDesc": "請我喝杯咖啡，支持持續開發 ☕",
-    "aboutFooter": "Made with ❤️ by Bruce Yang",
+    "aboutFooter": "Modified with ❤️ by Griiid",
     "topicAirportBoarding": "機場通關與登機",
     "topicBusinessMeeting": "商務會議與簡報",
     "topicCustomerSupport": "電話客服與問題排除",

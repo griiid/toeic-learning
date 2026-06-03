@@ -152,7 +152,7 @@ export default {
     "aboutGithubDesc": "オープンソースコードを見る（Star歓迎）⭐",
     "aboutFeedbackTitle": "バグ報告 / 提案",
     "aboutCoffeeDesc": "コーヒー1杯で継続開発を応援してください ☕",
-    "aboutFooter": "Made with ❤️ by Bruce Yang",
+    "aboutFooter": "Modified with ❤️ by Griiid",
     "examSectionListening": "リスニング",
     "examSectionReading": "リーディング",
     "examSectionVocabulary": "語彙",
