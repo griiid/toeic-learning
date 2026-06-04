@@ -243,6 +243,13 @@ async function maybeShowUpdateNotice({ preferNetwork = true } = {}) {
 
   if (!candidate) return null;
 
+  if (ack == null) {
+    await setAcknowledgedVersion(candidate.version);
+    updateState.acknowledgedVersion = candidate.version;
+    clearPendingUpdateInfo();
+    return candidate;
+  }
+
   if (candidate.version === ack) {
     if (updateState.registration?.waiting) {
       updateState.waitingWorker = updateState.registration.waiting;
