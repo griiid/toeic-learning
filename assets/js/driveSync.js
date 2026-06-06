@@ -73,7 +73,7 @@ export const DriveSync = {
         }
         const ok = await new Promise((resolve) => {
             this._pendingLoginResolve = resolve;
-            this.tokenClient.requestAccessToken({ prompt: 'consent' });
+            this.tokenClient.requestAccessToken({ prompt: 'select_account' });
         });
         return ok;
     },
