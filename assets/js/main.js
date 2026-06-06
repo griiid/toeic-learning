@@ -1,9 +1,9 @@
 // App entry point: initialisation, tab switching, event binding, module wiring.
 
 import { state, VOICE_OPTIONS, VOICE_NAMES, SPEAKING_ACCENT_OPTIONS, ICONS, GEMINI_TEXT_MODELS, OPENAI_TEXT_MODELS, OPENAI_VOICE_OPTIONS, OPENAI_VOICE_NAMES } from './state.js';
-import { speakText } from './utils.js';
+import { speakText, speakTextAI } from './utils.js';
 import { DB } from './db.js';
-import { fetchGeminiText, fetchGeminiTTS, fetchExamQuestions, fetchExamWrongAnswerExplanations } from './apiProvider.js';
+import { fetchGeminiText, fetchTTS, fetchExamQuestions, fetchExamWrongAnswerExplanations } from './apiProvider.js';
 import { DriveSync } from './driveSync.js';
 import { setupAudio } from './audioPlayer.js';
 import { renderContent, toggleEnglish, toggleTranslation, updateToggleButtons } from './render.js';
@@ -44,6 +44,7 @@ DriveSync.setCallbacks({ renderHistory, loadLastSession, renderVocabTab });
 
 /* ── Expose minimal globals needed by dynamic innerHTML onclick ── */
 window.speakText = speakText;
+window.speakTextAI = speakTextAI;
 window.finishSrsReview = finishSrsReview;
 window.DriveSync = DriveSync;
 document.addEventListener('player-loading-changed', updatePlayerBarVisibility);
@@ -1171,7 +1172,7 @@ GENERATE_BTN.onclick = async () => {
 
         renderContent(contentData, voiceName);
         setLearnRuntimeMode('article');
-        const audioBase64 = await fetchGeminiTTS(contentData.article, voiceName);
+        const audioBase64 = await fetchTTS(contentData.article, voiceName);
         setupAudio(audioBase64);
         const articleRecord = await saveToHistory(contentData, audioBase64, voiceName, customTopic);
         markLearnRecord(articleRecord?.id ? { id: articleRecord.id, type: 'article', fromHistory: false } : null);

@@ -1,8 +1,8 @@
 // History: save/load/delete learning sessions, render history list.
 
-import { state, ICONS, VOICE_NAMES } from './state.js';
+import { state, ICONS, VOICE_NAMES, OPENAI_VOICE_NAMES } from './state.js';
 import { DB } from './db.js';
-import { fetchGeminiTTS } from './apiProvider.js';
+import { fetchTTS } from './apiProvider.js';
 import { renderContent } from './render.js';
 import { setupAudio, setPlayerLoading } from './audioPlayer.js';
 import { t } from './i18n.js';
@@ -141,8 +141,13 @@ export function loadSession(item) {
     if (item.audio) {
         setTimeout(() => setupAudio(item.audio), 0);
     } else {
-        const v = item.voice || VOICE_NAMES[Math.floor(Math.random() * VOICE_NAMES.length)];
-        fetchGeminiTTS(item.data.article, v)
+        const activeKey = state.provider === 'openai' ? state.openaiApiKey : state.apiKey;
+        if (!activeKey) { setPlayerLoading(false); return; }
+        const voicePool = state.provider === 'openai' ? OPENAI_VOICE_NAMES : VOICE_NAMES;
+        const v = (item.voice && voicePool.includes(item.voice))
+            ? item.voice
+            : voicePool[Math.floor(Math.random() * voicePool.length)];
+        fetchTTS(item.data.article, v)
             .then(async (b) => {
                 setupAudio(b);
                 item.audio = b;

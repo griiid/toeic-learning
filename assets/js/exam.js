@@ -1,6 +1,6 @@
 // Exam model helpers: normalize, render, grade, and explanation merge.
 
-import { fetchGeminiTTS } from './apiProvider.js';
+import { fetchTTS } from './apiProvider.js';
 import { t } from './i18n.js';
 import { createId } from './id.js';
 import { pcmToWavBlob } from './audioCodec.js';
@@ -181,7 +181,7 @@ export async function playListeningQuestion(q, voiceName = 'Kore', prefetchedBas
         let lastError = null;
         for (let attempt = 0; attempt < 2; attempt++) {
             try {
-                base64 = await fetchGeminiTTS(q.audioText || q.question, voiceName);
+                base64 = await fetchTTS(q.audioText || q.question, voiceName);
                 listeningAudioCache.set(key, base64);
                 break;
             } catch (error) {

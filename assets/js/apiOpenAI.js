@@ -137,7 +137,7 @@ export async function fetchExamWrongAnswerExplanations(payload) {
     return Array.isArray(result?.items) ? result.items : [];
 }
 
-export async function fetchGeminiTTS(text, voiceName) {
+export async function fetchTTS(text, voiceName) {
     const voice = (voiceName === 'random' || !voiceName) ? 'alloy' : voiceName;
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',

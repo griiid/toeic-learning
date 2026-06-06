@@ -2,7 +2,7 @@
 
 import { ICONS, SRS_INTERVALS, SRS_MAX_WORDS, getNextReviewTime } from './state.js';
 import { DB } from './db.js';
-import { shuffleArray, speakText, speakTextPromise } from './utils.js';
+import { shuffleArray, speakTextAI } from './utils.js';
 import { t } from './i18n.js';
 
 let _onFinish = null;
@@ -63,11 +63,11 @@ function renderSrsQuestion() {
     qArea.innerHTML = ''; oArea.innerHTML = '';
 
     const enLower = toLowerWord(word.en);
-    const safeEn = enLower.replace(/'/g, "\\'");
 
     if (q.type === 'en2zh') {
-        qArea.innerHTML = `<div class="srs-question-hint">${t('srsHintEnToZh')}</div><div class="srs-question-word">${enLower} <button class="mini-speaker" onclick="speakText('${safeEn}')">${ICONS.speaker}</button></div>`;
-        setTimeout(() => speakText(enLower), 300);
+        qArea.innerHTML = `<div class="srs-question-hint">${t('srsHintEnToZh')}</div><div class="srs-question-word">${enLower} <button class="mini-speaker">${ICONS.speaker}</button></div>`;
+        qArea.querySelector('.mini-speaker').onclick = () => speakTextAI(enLower);
+        setTimeout(() => speakTextAI(enLower), 300);
         const opts = shuffleArray([word.zh, ...getDistractors(word, srsState.allWords, 'zh')]);
         opts.forEach(o => { const b = document.createElement('button'); b.className = 'srs-option'; b.textContent = o; b.onclick = () => handleSrsAnswer(b, o, word.zh, q.type); oArea.appendChild(b); });
     } else if (q.type === 'zh2en') {
@@ -77,8 +77,8 @@ function renderSrsQuestion() {
         opts.forEach(o => { const b = document.createElement('button'); b.className = 'srs-option'; b.textContent = o; b.onclick = () => handleSrsAnswer(b, o, correctEn, q.type); oArea.appendChild(b); });
     } else if (q.type === 'listen') {
         qArea.innerHTML = `<div class="srs-question-hint">${t('srsHintListenToZh')}</div><button class="srs-listen-btn" id="srsListenBtn">${ICONS.speaker}</button><div class="srs-reveal-word hidden" id="srsRevealWord"></div>`;
-        document.getElementById('srsListenBtn').onclick = () => speakText(enLower);
-        setTimeout(() => speakText(enLower), 300);
+        document.getElementById('srsListenBtn').onclick = () => speakTextAI(enLower);
+        setTimeout(() => speakTextAI(enLower), 300);
         const opts = shuffleArray([word.zh, ...getDistractors(word, srsState.allWords, 'zh')]);
         opts.forEach(o => { const b = document.createElement('button'); b.className = 'srs-option'; b.textContent = o; b.onclick = () => handleSrsAnswer(b, o, word.zh, q.type); oArea.appendChild(b); });
     } else if (q.type === 'listen3') {
@@ -94,12 +94,12 @@ function renderSrsQuestion() {
         qArea.innerHTML = `<div class="srs-question-hint">${t('srsHintListenToEn')}</div><div class="srs-question-word">${word.zh}</div><div class="srs-reveal-word hidden" id="srsRevealWord"></div><div class="srs-listen3-container">${choices.map((c, i) => `<div class="srs-listen3-item"><button class="srs-listen3-btn" data-label="${labels[i]}" data-word="${c.en.replace(/"/g, '&quot;')}">${ICONS.speaker}</button><div class="srs-listen3-label">${labels[i]}</div></div>`).join('')}</div>`;
 
         qArea.querySelectorAll('.srs-listen3-btn').forEach(btn => {
-            btn.onclick = () => speakText(btn.dataset.word);
+            btn.onclick = () => speakTextAI(btn.dataset.word);
         });
 
         async function autoPlaySequence() {
             for (const c of choices) {
-                await speakTextPromise(c.en);
+                await speakTextAI(c.en);
                 await new Promise(r => setTimeout(r, 400));
             }
         }
@@ -135,7 +135,7 @@ function handleSrsAnswer(btnEl, selected, correct, type) {
         revealEl.classList.remove('hidden');
     }
 
-    speakText(toLowerWord(word.en));
+    speakTextAI(toLowerWord(word.en));
     const delay = isCorrect ? 1200 : 2000;
     setTimeout(() => { srsState.currentQ++; if (srsState.currentQ >= srsState.questions.length) showSrsResults(); else renderSrsQuestion(); }, delay);
 }
@@ -243,7 +243,7 @@ async function showSrsResults() {
     });
 
     oArea.querySelectorAll('.srs-result-speaker').forEach(btn => {
-        btn.onclick = () => speakText(btn.dataset.speak || '');
+        btn.onclick = () => speakTextAI(btn.dataset.speak || '');
     });
 
     const doneBtn = document.createElement('button');
