@@ -3,7 +3,7 @@
 import { state, ICONS, SRS_INTERVALS, SRS_MIN_WORDS, SRS_MAX_WORDS, getNextReviewTime } from './state.js';
 import { DB } from './db.js';
 import { fetchWordDetails, fetchPhraseDetails, validateWordWithLanguageTool } from './apiProvider.js';
-import { speakText } from './utils.js';
+import { speakTextAI } from './utils.js';
 import { t } from './i18n.js';
 
 let _startSrsReview = null;
@@ -105,7 +105,7 @@ function showWordModal(word) {
         }
 
         document.getElementById('wmWord').innerText = word;
-        document.getElementById('btnWordAudio').onclick = () => speakText(word);
+        document.getElementById('btnWordAudio').onclick = () => speakTextAI(word);
         actionArea.innerHTML = '';
 
         if (vocabItem) {
@@ -115,7 +115,7 @@ function showWordModal(word) {
             document.getElementById('wmDef').innerText = vocabItem.def || '';
             if (vocabItem.ex) {
                 document.getElementById('wmExText').innerText = vocabItem.ex;
-                document.getElementById('wmExSpeakBtn').onclick = () => speakText(vocabItem.ex);
+                document.getElementById('wmExSpeakBtn').onclick = () => speakTextAI(vocabItem.ex);
                 document.getElementById('wmEx').classList.remove('hidden');
             } else {
                 document.getElementById('wmEx').classList.add('hidden');
@@ -145,7 +145,7 @@ function showWordModal(word) {
                     document.getElementById('wmIpa').innerText = info.ipa;
                     document.getElementById('wmDef').innerText = info.def;
                     document.getElementById('wmExText').innerText = info.ex;
-                    document.getElementById('wmExSpeakBtn').onclick = () => speakText(info.ex);
+                    document.getElementById('wmExSpeakBtn').onclick = () => speakTextAI(info.ex);
                     document.getElementById('wmEx').classList.remove('hidden');
                     const exZhEl = document.getElementById('wmExZh');
                     if (info.ex_zh) { exZhEl.textContent = info.ex_zh; exZhEl.classList.remove('hidden'); }
@@ -343,8 +343,8 @@ function renderLookupResultCard() {
         ${exZh ? `<div class="vocab-ex-zh">${escapeHtml(exZh)}</div>` : ''}
         <div id="vocabLookupActionArea" class="wm-actions" style="margin-top:10px;"></div>
     `;
-    card.querySelector('[data-action="speak-word"]')?.addEventListener('click', () => speakText(word));
-    card.querySelector('[data-action="speak-ex"]')?.addEventListener('click', () => speakText(ex));
+    card.querySelector('[data-action="speak-word"]')?.addEventListener('click', () => speakTextAI(word));
+    card.querySelector('[data-action="speak-ex"]')?.addEventListener('click', () => speakTextAI(ex));
     resultEl.innerHTML = '';
     resultEl.appendChild(card);
     renderSaveButton(card.querySelector('#vocabLookupActionArea'), item.word, item, {
@@ -467,7 +467,7 @@ export async function renderVocabTab() {
         const dateStr = isOverdue ? t('vocabReadyForReview') : new Date(w.nextReview).toLocaleDateString();
         const displayEn = normalizeWordId(w.en);
         card.innerHTML = `<div class="saved-word-info"><div class="saved-word-top"><span class="saved-word-en">${displayEn}</span>${w.pos ? `<span class="vocab-pos">${w.pos}</span>` : ''}<span class="srs-badge srs-badge-${w.level}">Lv.${w.level}</span></div><div class="saved-word-zh">${w.zh}</div><div class="saved-word-next">${isOverdue ? '⏰ ' : ''}${t('vocabNextReviewLabel', { date: dateStr })}</div></div><div class="saved-word-actions"><button class="saved-word-speak">${ICONS.speaker}</button><button class="saved-word-delete">${ICONS.close}</button></div>`;
-        card.querySelector('.saved-word-speak').onclick = () => speakText(displayEn);
+        card.querySelector('.saved-word-speak').onclick = () => speakTextAI(displayEn);
         card.querySelector('.saved-word-delete').onclick = async () => {
             if (confirm(t('vocabDeleteConfirm', { word: displayEn }))) {
                 await removeWordFromNotebook(w.id);

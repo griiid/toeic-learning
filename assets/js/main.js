@@ -1,9 +1,9 @@
 // App entry point: initialisation, tab switching, event binding, module wiring.
 
 import { state, VOICE_OPTIONS, VOICE_NAMES, SPEAKING_ACCENT_OPTIONS, ICONS, GEMINI_TEXT_MODELS, OPENAI_TEXT_MODELS, OPENAI_VOICE_OPTIONS, OPENAI_VOICE_NAMES } from './state.js';
-import { speakText } from './utils.js';
+import { speakText, speakTextAI } from './utils.js';
 import { DB } from './db.js';
-import { fetchGeminiText, fetchGeminiTTS, fetchExamQuestions, fetchExamWrongAnswerExplanations } from './apiProvider.js';
+import { fetchGeminiText, fetchTTS, fetchExamQuestions, fetchExamWrongAnswerExplanations } from './apiProvider.js';
 import { DriveSync } from './driveSync.js';
 import { setupAudio } from './audioPlayer.js';
 import { renderContent, toggleEnglish, toggleTranslation, updateToggleButtons } from './render.js';
@@ -44,6 +44,7 @@ DriveSync.setCallbacks({ renderHistory, loadLastSession, renderVocabTab });
 
 /* ── Expose minimal globals needed by dynamic innerHTML onclick ── */
 window.speakText = speakText;
+window.speakTextAI = speakTextAI;
 window.finishSrsReview = finishSrsReview;
 window.DriveSync = DriveSync;
 document.addEventListener('player-loading-changed', updatePlayerBarVisibility);
@@ -726,6 +727,14 @@ if (btnClearOpenAIApiKey) {
 }
 document.getElementById('btnCloseKeyModal').onclick = () => keyModal.classList.remove('active');
 
+const aiTtsToggle = document.getElementById('aiTtsToggle');
+if (aiTtsToggle) {
+    aiTtsToggle.addEventListener('change', async () => {
+        state.useAiTTS = aiTtsToggle.checked;
+        await DB.setSetting('use_ai_tts', aiTtsToggle.checked);
+    });
+}
+
 const btnTestApiKey = document.getElementById('btnTestApiKey');
 const apiTestResult = document.getElementById('apiTestResult');
 
@@ -1171,7 +1180,7 @@ GENERATE_BTN.onclick = async () => {
 
         renderContent(contentData, voiceName);
         setLearnRuntimeMode('article');
-        const audioBase64 = await fetchGeminiTTS(contentData.article, voiceName);
+        const audioBase64 = await fetchTTS(contentData.article, voiceName);
         setupAudio(audioBase64);
         const articleRecord = await saveToHistory(contentData, audioBase64, voiceName, customTopic);
         markLearnRecord(articleRecord?.id ? { id: articleRecord.id, type: 'article', fromHistory: false } : null);
@@ -1211,6 +1220,12 @@ GENERATE_BTN.onclick = async () => {
         if (savedProvider) state.provider = savedProvider;
         const savedModel = await DB.getSetting('selected_model');
         if (savedModel) state.selectedModel = savedModel;
+        const savedUseAiTTS = await DB.getSetting('use_ai_tts');
+        if (savedUseAiTTS === false) {
+            state.useAiTTS = false;
+            const toggle = document.getElementById('aiTtsToggle');
+            if (toggle) toggle.checked = false;
+        }
         const hasActiveKey = state.provider === 'openai' ? !!state.openaiApiKey : !!state.apiKey;
         if (!hasActiveKey) keyModal.classList.add('active');
         renderModelOptions(state.provider);

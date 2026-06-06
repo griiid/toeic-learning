@@ -2,7 +2,7 @@
 
 import { state, ICONS, VOICE_OPTIONS } from './state.js';
 import { DB } from './db.js';
-import { speakText } from './utils.js';
+import { speakTextAI } from './utils.js';
 import { addLongPressListener, toggleWordSaved, phraseToVocabItem, normalizeWordId } from './vocab.js';
 import { audioEl, playBtn, ensureAudioReady } from './audioPlayer.js';
 import { t } from './i18n.js';
@@ -122,7 +122,7 @@ export function renderContent(data, voiceName) {
             <div class="vocab-ex">${escapeHtml(ex)}<button class="mini-speaker" data-speak="${escapeHtml(ex)}">${ICONS.speaker}</button></div>
             ${exZh ? `<div class="vocab-ex-zh">${escapeHtml(exZh)}</div>` : ''}`;
         card.querySelectorAll('[data-speak]').forEach((btn) => {
-            btn.onclick = () => speakText(btn.dataset.speak || '');
+            btn.onclick = () => speakTextAI(btn.dataset.speak || '');
         });
         const saveBtn = card.querySelector('.vocab-save-btn');
         savedWordsPromise.then((savedSet) => {
@@ -162,7 +162,7 @@ export function renderContent(data, voiceName) {
             const vocabLike = phraseToVocabItem(p);
             card.innerHTML = `<div class="phrase-header"><span class="phrase-header-text">${escapeHtml(phrase)}</span><button class="mini-speaker" data-speak="${escapeHtml(phrase)}">${ICONS.speaker}</button><button class="vocab-save-btn phrase-save-btn" type="button">${ICONS.bookmark}</button></div><div class="phrase-meaning">${escapeHtml(meaning)}</div><div class="phrase-explanation">${escapeHtml(explanation)}</div><div class="phrase-example">${escapeHtml(example)}<button class="mini-speaker" data-speak="${escapeHtml(example)}" style="margin-left:4px;">${ICONS.speaker}</button></div>${exampleZh ? `<div class="phrase-example-zh">${escapeHtml(exampleZh)}</div>` : ''}`;
             card.querySelectorAll('[data-speak]').forEach((btn) => {
-                btn.onclick = () => speakText(btn.dataset.speak || '');
+                btn.onclick = () => speakTextAI(btn.dataset.speak || '');
             });
             const saveBtn = card.querySelector('.vocab-save-btn');
             savedWordsPromise.then((savedSet) => {

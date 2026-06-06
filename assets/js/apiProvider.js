@@ -28,8 +28,8 @@ export function fetchExamWrongAnswerExplanations(payload) {
     return api().fetchExamWrongAnswerExplanations(payload);
 }
 
-export function fetchGeminiTTS(text, voiceName) {
-    return api().fetchGeminiTTS(text, voiceName);
+export function fetchTTS(text, voiceName) {
+    return api().fetchTTS(text, voiceName);
 }
 
 export { validateWordWithLanguageTool } from './apiGemini.js';
