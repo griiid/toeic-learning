@@ -127,14 +127,20 @@ export const DriveSync = {
         } catch (e) { logError('Failed to fetch user info', e); }
     },
 
-    async _apiFetch(url, opts = {}) {
+    async _apiFetch(url, opts = {}, _retried = false) {
         if (!this.accessToken) throw new Error('Not authenticated');
-        opts.headers = { ...opts.headers, Authorization: `Bearer ${this.accessToken}` };
-        const resp = await fetch(url, opts);
+        const fetchOpts = { ...opts, headers: { ...opts.headers, Authorization: `Bearer ${this.accessToken}` } };
+        const resp = await fetch(url, fetchOpts);
         if (resp.status === 401) {
             this.accessToken = null;
-            DB.setSetting('gis_access_token', null);
-            DB.setSetting('gis_token_expires_at', null);
+            await DB.setSetting('gis_access_token', null);
+            await DB.setSetting('gis_token_expires_at', null);
+            if (!_retried) {
+                const ok = await this.silentLogin();
+                if (ok && this.accessToken) {
+                    return this._apiFetch(url, opts, true);
+                }
+            }
             this.updateUI();
             throw new Error('Token expired');
         }
