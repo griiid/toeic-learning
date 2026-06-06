@@ -1,6 +1,9 @@
 export default {
     "appTitle": "TOEIC AI Tutor",
     "settingsTitle": "設定",
+    "settingsTtsLabel": "音声合成",
+    "settingsAiTtsLabel": "AI音声を使用（自然な発音）",
+    "settingsAiTtsHint": "オフにするとブラウザ内蔵音声を使用し、APIクォータを消費しません。",
     "settingsLanguageLabel": "表示言語",
     "settingsLanguageHint": "AIの解説と翻訳はこの言語で表示されます。",
     "settingsApiLabel": "Gemini API Key",

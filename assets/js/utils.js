@@ -65,9 +65,14 @@ function playBase64Audio(base64) {
 
 /**
  * AI TTS with browser Web Speech API fallback.
+ * Falls back to browser TTS immediately if state.useAiTTS is false.
  * Returns a promise that resolves when audio finishes (awaitable for sequencing).
  */
 export async function speakTextAI(text) {
+    if (!state.useAiTTS) {
+        await speakTextPromise(text);
+        return;
+    }
     try {
         const base64 = await fetchTTS(text, resolveVoiceName());
         await playBase64Audio(base64);

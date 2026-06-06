@@ -727,6 +727,14 @@ if (btnClearOpenAIApiKey) {
 }
 document.getElementById('btnCloseKeyModal').onclick = () => keyModal.classList.remove('active');
 
+const aiTtsToggle = document.getElementById('aiTtsToggle');
+if (aiTtsToggle) {
+    aiTtsToggle.addEventListener('change', async () => {
+        state.useAiTTS = aiTtsToggle.checked;
+        await DB.setSetting('use_ai_tts', aiTtsToggle.checked);
+    });
+}
+
 const btnTestApiKey = document.getElementById('btnTestApiKey');
 const apiTestResult = document.getElementById('apiTestResult');
 
@@ -1212,6 +1220,12 @@ GENERATE_BTN.onclick = async () => {
         if (savedProvider) state.provider = savedProvider;
         const savedModel = await DB.getSetting('selected_model');
         if (savedModel) state.selectedModel = savedModel;
+        const savedUseAiTTS = await DB.getSetting('use_ai_tts');
+        if (savedUseAiTTS === false) {
+            state.useAiTTS = false;
+            const toggle = document.getElementById('aiTtsToggle');
+            if (toggle) toggle.checked = false;
+        }
         const hasActiveKey = state.provider === 'openai' ? !!state.openaiApiKey : !!state.apiKey;
         if (!hasActiveKey) keyModal.classList.add('active');
         renderModelOptions(state.provider);

@@ -19,6 +19,7 @@ export const state = {
     selectedModel: '',
     targetScore: 700,
     selectedVoice: 'random',
+    useAiTTS: true,
     practiceMode: 'article',
     lastUsedVoice: null,
     currentData: null,
